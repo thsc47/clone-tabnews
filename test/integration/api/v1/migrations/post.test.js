@@ -1,6 +1,10 @@
 import database from "infra/database";
+import orchestrator from "test/orchestrator.js";
 
-beforeAll(ClearDatabase);
+beforeAll(async () => {
+  await orchestrator.waitForAllServices();
+  await database.query("DROP SCHEMA public CASCADE; CREATE SCHEMA public;");
+});
 
 test("POST to /api/v1/migrations should return 200", async () => {
   const beforeResponse = await fetch(
@@ -24,7 +28,3 @@ test("POST to /api/v1/migrations should return 200", async () => {
   expect(Array.isArray(emptyBody)).toBe(true);
   expect(emptyBody.length).toBe(0);
 });
-
-async function ClearDatabase() {
-  await database.query("DROP SCHEMA public CASCADE; CREATE SCHEMA public;");
-}
